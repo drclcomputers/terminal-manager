@@ -3,4 +3,4 @@ A system information manager for the terminal. It provides a view over the usage
 <br>
 Download and compile "terminal-manager.cpp".
 <br><br>
-Add the parameter -h for help.
+Add the parameter -h for help and info.
