@@ -246,7 +246,7 @@ int main(int argc, char *argv[]) {
 				listdrives();
 			}
 			else {
-				cout << "One or more of parameters passed is unknoun!\n";
+				cout << "One or more of the parameters passed is unknoun!\n";
 			}
 		}
 	}
