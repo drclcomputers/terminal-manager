@@ -225,7 +225,7 @@ int main(int argc, char *argv[]) {
 				}
 			}
 			else if (strcmp(argv[1], "-h") == 0) {
-				cout << "-static - no update rate\n-slow - slow update rate\n-cpu - only shows cpu usage in real time\n-ram - only shows ram info in real time\n-storage - only shows storage info\n-processes - only shows number of processes in real time\n\nAditionally, -static can be included after some parameters like -cpu or -ram\n";
+				cout << "HELP - ver 1.2\n\n-static - no update rate\n-slow - slow update rate\n-cpu - only shows cpu usage in real time\n-ram - only shows ram info in real time\n-storage - only shows storage info in real time\n-processes - only shows number of processes in real time\n\nAditionally, -static can be included after some parameters like -cpu or -ram\n";
 			}
 			else {
 				cout << "Unknoun parameter passed!\n";
