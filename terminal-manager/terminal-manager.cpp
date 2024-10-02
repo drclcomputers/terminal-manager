@@ -4,6 +4,15 @@ using namespace std;
 
 #ifdef _WIN32
 #include<windows.h>
+#include <psapi.h>
+void wait(int n) {
+	Sleep(n);
+}
+
+void clear() {
+	system("cls");
+}
+
 float get_cpu() {
 	FILETIME idleTime, kernelTime, userTime;
 	GetSystemTimes(&idleTime, &kernelTime, &userTime);
@@ -60,12 +69,28 @@ void listdrives() {
 	}
 }
 
+int get_nr_processes() {
+	DWORD processIds[1024], nr, cb;
+	EnumProcesses(processIds, sizeof(processIds), &cb);
+	nr = cb / sizeof(DWORD);
+	return nr;
+}
+
 #else
 #include<unistd.h>
 #include<fstream>
 #include<cstring>
 #include<cstdlib>
 #include <sys/statvfs.h>
+#include<pwd.h>
+
+void wait(int n) {
+	sleep(n/1000);
+}
+
+void clear() {
+	system("clear");
+}
 
 float get_cpu() {
 	ifstream cpufile("/proc/stat");
@@ -124,12 +149,94 @@ void listdrives() {
 	cout << "Storage (used/total) : " << total - free << '/' << total << "GB\n";
 }
 
+int get_nr_processes() {
+	int nr = 0;
+	struct passwd* pw;
+	setpwent();
+	while ((pw = getpwent()) != nullptr)
+		nr++;
+	endpwent();
+	return nr;
+}
+
 #endif
 
-int main() {
-	cout << "CPU (usage): " << get_cpu() << "%\n";
-	int totalmemory = totalmem();
-	cout << "Memory (used/total): " << totalmemory-freemem() << '\\' << totalmemory << "MB\n";
-	listdrives();
+int main(int argc, char *argv[]) {
+	if (argc == 1) {
+		while (true) {
+			clear();
+			cout << "CPU (usage): " << get_cpu() << "%\n";
+			int totalmemory = totalmem();
+			cout << "Memory (used/total): " << totalmemory - freemem() << '\\' << totalmemory << "MB\n";
+			listdrives();
+			cout << "Processes : " << get_nr_processes() << "\n";
+			wait(1000);
+		}
+	}
+	else {
+		if (argc == 2) {
+			if (strcmp(argv[1], "-static") == 0) {
+				cout << "CPU (usage): " << get_cpu() << "%\n";
+				int totalmemory = totalmem();
+				cout << "Memory (used/total): " << totalmemory - freemem() << '\\' << totalmemory << "MB\n";
+				listdrives();
+				cout << "Processes : " << get_nr_processes() << "\n";
+			}
+			else if (strcmp(argv[1], "-slow") == 0) {
+				while (true) {
+					clear();
+					cout << "CPU (usage): " << get_cpu() << "%\n";
+					int totalmemory = totalmem();
+					cout << "Memory (used/total): " << totalmemory - freemem() << '\\' << totalmemory << "MB\n";
+					listdrives();
+					cout << "Processes : " << get_nr_processes() << "\n";
+					wait(3000);
+				}
+			}
+			else if (strcmp(argv[1], "-cpu") == 0) {
+				while (true) {
+					clear();
+					cout << "CPU (usage): " << get_cpu() << "%\n";
+					wait(1000);
+				}
+			}
+			else if (strcmp(argv[1], "-ram") == 0) {
+				while (true) {
+					clear();
+					int totalmemory = totalmem();
+					cout << "Memory (used/total): " << totalmemory - freemem() << '\\' << totalmemory << "MB\n";
+					wait(1000);
+				}
+			}
+			else if (strcmp(argv[1], "-storage") == 0) {
+				listdrives();
+			}
+			else if (strcmp(argv[1], "-processes") == 0) {
+				while (true) {
+					clear();
+					cout << "Processes : " << get_nr_processes() << "\n";
+					wait(1000);
+				}
+			}
+			else {
+				cout << "Unknoun parameter passed!\n";
+			}
+		}
+		else {
+			if (strcmp(argv[1], "-cpu") == 0 && strcmp(argv[2], "-static") == 0) {
+				cout << "CPU (usage): " << get_cpu() << "%\n";
+			}
+			else if (strcmp(argv[1], "-ram") == 0 && strcmp(argv[2], "-static") == 0) {
+				int totalmemory = totalmem();
+				cout << "Memory (used/total): " << totalmemory - freemem() << '\\' << totalmemory << "MB\n";
+			}
+			else if (strcmp(argv[1], "-processes") == 0 && strcmp(argv[2], "-static") == 0) {
+				cout << "Processes : " << get_nr_processes() << "\n";
+			}
+			else {
+				cout << "One of parameters passed is unknoun!\n";
+			}
+		}
+	}
 	return 0;
 }
