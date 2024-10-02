@@ -211,7 +211,11 @@ int main(int argc, char *argv[]) {
 				}
 			}
 			else if (strcmp(argv[1], "-storage") == 0) {
-				listdrives();
+				while (true) {
+					clear();
+					listdrives();
+					wait(1000);
+				}
 			}
 			else if (strcmp(argv[1], "-processes") == 0) {
 				while (true) {
@@ -219,6 +223,9 @@ int main(int argc, char *argv[]) {
 					cout << "Processes : " << get_nr_processes() << "\n";
 					wait(1000);
 				}
+			}
+			else if (strcmp(argv[1], "-h") == 0) {
+				cout << "-static - no update rate\n-slow - slow update rate\n-cpu - only shows cpu usage in real time\n-ram - only shows ram info in real time\n-storage - only shows storage info\n-processes - only shows number of processes in real time\n\nAditionally, -static can be included after some parameters like -cpu or -ram\n";
 			}
 			else {
 				cout << "Unknoun parameter passed!\n";
@@ -234,6 +241,9 @@ int main(int argc, char *argv[]) {
 			}
 			else if (strcmp(argv[1], "-processes") == 0 && strcmp(argv[2], "-static") == 0) {
 				cout << "Processes : " << get_nr_processes() << "\n";
+			}
+			else if (strcmp(argv[1], "-storage") == 0 && strcmp(argv[2], "-static") == 0) {
+				listdrives();
 			}
 			else {
 				cout << "One or more of parameters passed is unknoun!\n";
