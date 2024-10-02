@@ -5,6 +5,7 @@ using namespace std;
 #ifdef _WIN32
 #include<windows.h>
 #include <psapi.h>
+
 void wait(int n) {
 	Sleep(n);
 }
@@ -61,7 +62,7 @@ int freestorage(wchar_t* drive) {
 
 void listdrives() {
 	cout << "Storage (used/total):\n";
-	wchar_t buffer[10000];
+	wchar_t buffer[1000];
 	DWORD result = GetLogicalDriveStrings(sizeof(buffer), buffer);
 	for (wchar_t* drive = buffer; *drive != '\0'; drive += 4) {
 		int totsto = totalstorage(drive);
@@ -201,6 +202,7 @@ int main(int argc, char *argv[]) {
 				}
 			}
 			else if (strcmp(argv[1], "-ram") == 0) {
+
 				while (true) {
 					clear();
 					int totalmemory = totalmem();
@@ -234,7 +236,7 @@ int main(int argc, char *argv[]) {
 				cout << "Processes : " << get_nr_processes() << "\n";
 			}
 			else {
-				cout << "One of parameters passed is unknoun!\n";
+				cout << "One or more of parameters passed is unknoun!\n";
 			}
 		}
 	}
