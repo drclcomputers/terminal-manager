@@ -19,24 +19,53 @@ float get_cpu() {
 
 	return usage;
 }
+
 int freemem() {
 	MEMORYSTATUSEX memStatus;
 	memStatus.dwLength = sizeof(memStatus);
 	GlobalMemoryStatusEx(&memStatus);
 	return memStatus.ullAvailPhys / (1024 * 1024);
 }
+
 int totalmem() {
 	MEMORYSTATUSEX memStatus;
 	memStatus.dwLength = sizeof(memStatus);
 	GlobalMemoryStatusEx(&memStatus);
 	return memStatus.ullTotalPhys / (1024 * 1024);
-	
 }
+
+int totalstorage(wchar_t* drive) {
+	ULARGE_INTEGER freeBytesAvailableToUser;
+	ULARGE_INTEGER totalNumberOfBytes;
+	ULARGE_INTEGER totalNumberOfFreeBytes;
+	GetDiskFreeSpaceEx(drive, &freeBytesAvailableToUser, &totalNumberOfBytes, &totalNumberOfFreeBytes);
+	return totalNumberOfBytes.QuadPart/1024/1024/1024;
+}
+
+int freestorage(wchar_t* drive) {
+	ULARGE_INTEGER freeBytesAvailableToUser;
+	ULARGE_INTEGER totalNumberOfBytes;
+	ULARGE_INTEGER totalNumberOfFreeBytes;
+	GetDiskFreeSpaceEx(drive, &freeBytesAvailableToUser, &totalNumberOfBytes, &totalNumberOfFreeBytes);
+	return totalNumberOfFreeBytes.QuadPart / 1024 / 1024/1024;
+}
+
+void listdrives() {
+	cout << "Storage (used/total):\n";
+	wchar_t buffer[10000];
+	DWORD result = GetLogicalDriveStrings(sizeof(buffer), buffer);
+	for (wchar_t* drive = buffer; *drive != '\0'; drive += 4) {
+		int totsto = totalstorage(drive);
+		wcout << drive << " : " << totsto-freestorage(drive) << "/" << totsto << "GB\n";
+	}
+}
+
 #else
 #include<unistd.h>
 #include<fstream>
 #include<cstring>
 #include<cstdlib>
+#include <sys/statvfs.h>
 
 float get_cpu() {
 	ifstream cpufile("/proc/stat");
@@ -87,11 +116,20 @@ int totalmem() {
 	return total / 1024;
 }
 
+void listdrives() {
+	struct statvfs buffer;
+	statvfs("/", &buffer);
+	unsigned long total = buffer.f_frsize * buffer.f_blocks/1024/1024/1024;
+	unsigned long free = buffer.f_frsize * buffer.f_bfree / 1024 / 1024 / 1024;
+	cout << "Storage (used/total) : " << total - free << '/' << total << "GB\n";
+}
+
 #endif
 
 int main() {
-	cout << "CPU: " << get_cpu() << '\n';
+	cout << "CPU (usage): " << get_cpu() << "%\n";
 	int totalmemory = totalmem();
-	cout << "Memory: " << totalmemory-freemem() << '\\' << totalmemory << "MB\n";
+	cout << "Memory (used/total): " << totalmemory-freemem() << '\\' << totalmemory << "MB\n";
+	listdrives();
 	return 0;
 }
